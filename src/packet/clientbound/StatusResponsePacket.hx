@@ -2,7 +2,6 @@ package packet.clientbound;
 
 import haxe.io.BytesOutput;
 import haxe.Json;
-import haxe.io.Output;
 
 using VarIntLong;
 

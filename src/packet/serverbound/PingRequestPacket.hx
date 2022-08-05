@@ -1,7 +1,6 @@
 package packet.serverbound;
 
 import haxe.io.Bytes;
-import haxe.Int64;
 import haxe.io.Input;
 
 class PingRequestPacket extends ServerboundPacket {

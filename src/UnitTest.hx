@@ -2,11 +2,15 @@ package;
 
 import haxe.io.BytesOutput;
 import haxe.io.BytesInput;
-import haxe.io.Bytes;
 
 using StringTools;
 using VarIntLong;
 
+
+/**
+    i made this to sanity check my parsing of var ints. it worked fine.
+    but this testing code sucks and should probably be improved at some point
+**/
 class UnitTest {
     public static function main() {
         testVarInt(0);

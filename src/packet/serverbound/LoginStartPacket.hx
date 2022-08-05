@@ -2,7 +2,6 @@ package packet.serverbound;
 
 import haxe.Int64;
 import haxe.io.Bytes;
-import haxe.io.Input;
 
 using VarIntLong;
 

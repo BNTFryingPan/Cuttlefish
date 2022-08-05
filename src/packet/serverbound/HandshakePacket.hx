@@ -1,6 +1,5 @@
 package packet.serverbound;
 
-import packet.clientbound.StatusResponsePacket;
 import haxe.io.Input;
 
 using VarIntLong;

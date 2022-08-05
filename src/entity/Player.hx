@@ -1,7 +1,5 @@
 package entity;
 
-import uuid.Uuid;
-
 class Player extends Entity {
     public var uuid:String;
     public var name:String;

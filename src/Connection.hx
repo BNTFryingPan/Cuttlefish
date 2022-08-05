@@ -15,7 +15,6 @@ import packet.serverbound.HandshakePacket;
 import haxe.io.Output;
 import haxe.io.Input;
 import packet.serverbound.ServerboundPacket;
-import cpp.vm.Debugger.ThreadInfo;
 import sys.thread.Thread;
 import sys.net.Socket;
 

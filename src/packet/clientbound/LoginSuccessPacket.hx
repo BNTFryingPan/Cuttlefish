@@ -1,7 +1,5 @@
 package packet.clientbound;
 
-import haxe.io.BytesOutput;
-
 using VarIntLong;
 
 class LoginSuccessPacket extends ClientboundPacket {
