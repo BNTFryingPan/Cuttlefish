@@ -1,0 +1,5 @@
+-p src
+-m Main
+-L uuid
+--cpp ./build/
+--cmd ./test.sh
