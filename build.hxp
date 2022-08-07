@@ -1,0 +1,315 @@
+import hxp.*;
+
+class Build extends Script {
+   public function new() {
+      super();
+
+      switch command {
+         case 'build':
+            command_build();
+         case 'buildall':
+            command_buildAll();
+         case 'test':
+            command_test();
+         case 'run':
+            command_run();
+         default:
+            command_build();
+      }
+   }
+
+   function getProjectVersion():String {
+      return System.readText('./version.txt');
+   }
+
+   function command_build() {
+      if (flags.get('all')) {
+         Log.warn('Consider using the `buildall` command instead of the `-all` target flag to build for all targets.');
+         command_buildAll();
+         return;
+      }
+
+      if (flags.get('cpp') || flags.get('c++') || flags.get('cplusplus')) {
+         build_cpp();
+      }
+
+      if (flags.get('cs') || flags.get('csharp')) {
+         build_csharp();
+      }
+
+      if (flags.get('hl') || flags.get('hashlink')) {
+         build_hashlink();
+      }
+
+      if (flags.get('java')) {
+         build_java();
+      }
+
+      if (flags.get('node') || flags.get('js') || flags.get('nodejs')) {
+         build_nodejs();
+      }
+
+      if (flags.get('jvm')) {
+         build_jvm();
+      }
+
+      if (flags.get('neko')) {
+         build_neko();
+      }
+
+      if (flags.get('py') || flags.get('python')) {
+         build_python();
+      }
+   }
+
+   function command_buildAll() {
+      build_cpp();
+      build_csharp();
+      build_hashlink();
+      build_java();
+      //build_nodejs(); // hxnodejs doesnt support threads
+      build_jvm();
+      build_neko();
+      //build_python(); // python compiles... with a syntax error...
+   }
+
+   function createBaseHXML():HXML {
+      var hxml = new HXML({cp: ['src'], main: 'Main', libs: ['uuid']});
+      if (flags.get('debug')) hxml.debug = true;
+      return hxml;
+   }
+
+   function getExecutableName(target:String, arch:HostArchitecture, windows:Bool=false, debug:Bool=false) {
+      var name = 'Cuttlefish';
+
+      if (debug) name += '.dev';
+      name += '-${getProjectVersion()}';
+
+      name += switch target {
+         case 'cpp': '.cpp';
+         case 'csharp': '.cs';
+         case 'hashlink': '.hl';
+         case 'java': '.jar';
+         case 'nodejs': 'js';
+         case 'jvm': '.jvm.jar';
+         case 'neko': '.n';
+         case 'python': '.py';
+         default: throw 'unknown target';
+      }
+
+      if (['cpp', 'csharp'].contains(target)) {
+         name += switch arch {
+            case ARMV6: '.armv6';
+            case ARMV7: '.armv7';
+            case X86: '.x86';
+            case X64: '.x64';
+         };
+         if (windows) name += '.exe';
+      }
+      return name;
+   }
+
+   function build_cpp() {
+      var hxml = createBaseHXML();
+      hxml.cpp = './build/cpp/';
+      hxml.build();
+
+      var executablePath = './build/cpp/Main';
+      if (flags.get('debug')) executablePath += '-debug';
+      if (System.hostPlatform == WINDOWS) executablePath += '.exe';
+
+      var targetName = getExecutableName('cpp', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'));
+
+      //System.copyFile('./build/cpp/$executablePath', './out/$targetName');
+      System.copyFile(executablePath, './out/$targetName');
+      System.runCommand('./out/', 'chmod', ['a+x', targetName]);
+   }
+
+   function build_csharp() {
+      var hxml = createBaseHXML();
+      hxml.cs = './build/csharp/';
+      hxml.build();
+
+      var executablePath = './build/csharp/bin/Main';
+      if (flags.get('debug')) executablePath += '-Debug';
+      //if (System.hostPlatform == WINDOWS) executablePath += '.exe';
+      executablePath += '.exe';
+
+      //var targetName = getExecutableName('csharp', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'));
+      var targetName = getExecutableName('csharp', System.hostArchitecture, true, flags.get('debug'));
+
+      System.copyFile(executablePath, './out/$targetName');
+      if (hxml.debug) System.copyFile('$executablePath.mdb', './out/$targetName.mdb');
+   }
+
+   function build_hashlink() {
+      var hxml = createBaseHXML();
+      hxml.hl = './build/hashlink/Cuttlefish.hl';
+      hxml.build();
+
+      var targetName = getExecutableName('hashlink', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'));
+
+      System.copyFile('./build/hashlink/Cuttlefish.hl', './out/$targetName');
+   }
+
+   function build_jvm() {
+      var hxml = createBaseHXML();
+      hxml.java = './build/jvm/';
+      hxml.define('jvm', true);
+      hxml.build();
+
+      var targetName = getExecutableName('jvm', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'));
+
+      System.copyFile('./build/jvm/${flags.get('debug') ? 'Main-Debug' : 'Main'}.jar', './out/$targetName');
+   }
+
+   function build_nodejs() {
+      throw 'NodeJS is currently not supported! hxnodejs doesnt support threads!';
+   }
+
+   function build_java() {
+      var hxml = createBaseHXML();
+      hxml.java = './build/java/';
+      hxml.build();
+
+      var targetName = getExecutableName('java', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'));
+
+      System.copyFile('./build/java/${flags.get('debug') ? 'Main-Debug.jar' : 'Main.jar'}', './out/$targetName');
+   }
+
+   function build_neko() {
+      var hxml = createBaseHXML();
+      hxml.neko = './build/neko/Cuttlefish.n';
+      hxml.build();
+
+      var targetName = getExecutableName('neko', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'));
+
+      System.copyFile('./build/neko/Cuttlefish.n', './out/$targetName');
+   }
+
+   function build_python() {
+      Log.warn('Python does not currently work, but it does compile!');
+      var hxml = createBaseHXML();
+      hxml.python = './build/python/Cuttlefish.py';
+      hxml.build();
+
+      var targetName = getExecutableName('python', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'));
+
+      System.copyFile('./build/python/Cuttlefish.py', './out/$targetName');
+   }
+
+   function command_test() {
+      switch commandArgs[0] {
+         case 'cpp': test_cpp();
+         case 'cplusplus': test_cpp();
+         case 'c++': test_cpp();
+         case 'cs': test_csharp();
+         case 'csharp': test_csharp();
+         case 'c#': test_csharp();
+         case 'hl': test_hashlink();
+         case 'hashlink': test_hashlink();
+         case 'java': test_java();
+         case 'nodejs': test_nodejs();
+         case 'node': test_nodejs();
+         case 'js': test_nodejs();
+         case 'jvm': test_jvm();
+         case 'neko': test_neko();
+         case 'python': test_python();
+         case 'py': test_python();
+      }
+   }
+
+   function test_cpp() {
+      build_cpp();
+      run_cpp();
+   }
+
+   function test_csharp() {
+      build_csharp();
+      run_csharp();
+   }
+
+   function test_hashlink() {
+      build_hashlink();
+      run_hashlink();
+   }
+
+   function test_java() {
+      build_java();
+      run_java();
+   }
+
+   function test_nodejs() {
+      build_nodejs();
+      run_nodejs();
+   }
+
+   function test_jvm() {
+      build_jvm();
+      run_jvm();
+   }
+
+   function test_neko() {
+      build_neko();
+      run_neko();
+   }
+
+   function test_python() {
+      build_python();
+      run_python();
+   }
+
+   function command_run() {
+      switch commandArgs[0] {
+         case 'cpp': run_cpp();
+         case 'cplusplus': run_cpp();
+         case 'c++': run_cpp();
+         case 'cs': run_csharp();
+         case 'csharp': run_csharp();
+         case 'c#': run_csharp();
+         case 'hl': run_hashlink();
+         case 'hashlink': run_hashlink();
+         case 'java': run_java();
+         case 'nodejs': run_nodejs();
+         case 'node': run_nodejs();
+         case 'js': run_nodejs();
+         case 'jvm': run_jvm();
+         case 'neko': run_neko();
+         case 'python': run_python();
+         case 'py': run_python();
+      }
+   }
+
+   function run_cpp() {
+      System.runCommand('./out/', './' + getExecutableName('cpp', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug')));
+   }
+
+   function run_csharp() {
+      if (System.hostPlatform == WINDOWS) System.runCommand('./out/', getExecutableName('csharp', System.hostArchitecture, true, flags.get('debug')));
+      else System.runCommand('./out/', 'wine', [getExecutableName('csharp', System.hostArchitecture, true, flags.get('debug'))]);
+   }
+
+   function run_hashlink() {
+      System.runCommand('./out/', 'hl', [getExecutableName('hashlink', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'))]);
+   }
+
+   function run_java() {
+      System.runCommand('./out/', 'java', ['-jar', getExecutableName('java', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'))]);
+   }
+
+   function run_nodejs() {
+      // idk lol!
+   }
+
+   function run_jvm() {
+      System.runCommand('./out/', 'java', ['-jar', getExecutableName('jvm', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'))]);
+   }
+
+   function run_neko() {
+      System.runCommand('./out/', 'neko', [getExecutableName('neko', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'))]);
+   }
+
+   function run_python() {
+      System.runCommand('./out/', 'python3', [getExecutableName('python', System.hostArchitecture, System.hostPlatform == WINDOWS, flags.get('debug'))]);
+   }
+}

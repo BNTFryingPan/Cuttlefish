@@ -1,6 +1,0 @@
--p src
--m Main
--L uuid
-# i might remove `uuid` as a dependancy at some point
---cpp ./build/
---cmd ./test.sh

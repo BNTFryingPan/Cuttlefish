@@ -22,8 +22,4 @@ class HandshakePacket extends ServerboundPacket {
         packet.status = stream.readVarInt();
         return packet;
     }
-
-    override public function handle(client:Connection) {
-        //new StatusResponsePacket().send(client);
-    }
 }

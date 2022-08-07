@@ -1,5 +1,6 @@
 package;
 
+import haxe.Exception;
 import haxe.io.Bytes;
 import game.BlockLocation;
 import haxe.Int64;
@@ -72,11 +73,11 @@ class Connection {
         while (socketConnected) {
             try {
                 var packet = readPacket();
-                //trace('packet: ${Type.getClassName(Type.getClass(packet))}');
-                //packet.handle(this);
             } catch (e:haxe.io.Eof) {
                 trace('eof, stopping thread');
                 return;
+            } catch (e:Exception) {
+                trace(e.stack.toString());
             }
         }
     }
@@ -105,7 +106,6 @@ class Connection {
                     case Login:
                         var packet = LoginStartPacket.read(this);
                         this._player = new Player(Uuid.v3(packet.name, 'OfflinePlayer'), packet.name);
-                        trace('sending lsp');
                         new LoginSuccessPacket().send(this, UUID.fromString(player.uuid), player.name);
                         state = Play;
                         packet;
@@ -115,9 +115,7 @@ class Connection {
             case 0x01:
                 switch state {
                     case Status:
-                        trace('status ping');
                         var packet = PingRequestPacket.read(input);
-                        trace('read packet');
                         PingResponsePacket.sendFromRequestPacket(this, packet);
                         //socket.close();
                         //socketConnected = false;

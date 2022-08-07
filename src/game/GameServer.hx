@@ -25,8 +25,13 @@ class GameServer {
     }
 
     public function run() {
+        #if java
+        listeningSocket.listen(9999);
+        #end
         while (true) {
+            #if !java
             listeningSocket.listen(1);
+            #end
             var client = listeningSocket.accept();
             if (client == null) continue;
             this.connections.push(new Connection(client));
