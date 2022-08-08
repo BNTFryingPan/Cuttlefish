@@ -18,5 +18,6 @@ cd Cuttlefish
 haxelib install uuid
 haxelib install hxp
 haxelib run hxp --install-hxp-alias
-hxp test neko```
+hxp test neko
+```
 the last command `hxp test neko` will compile Cuttlefish for the Neko target, and then run the compiled output automatically.
