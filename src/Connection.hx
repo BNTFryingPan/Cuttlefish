@@ -1,5 +1,8 @@
 package;
 
+import Chat;
+import Chat.ChatComponent;
+import packet.clientbound.LoginDisconnectPacket;
 import packet.clientbound.PlayLoginPacket;
 import haxe.Exception;
 import haxe.io.Bytes;
@@ -111,9 +114,12 @@ class Connection {
                         var packet = LoginStartPacket.read(this);
                         var namespace = Bytes.ofString('OfflinePlayer').toHex();
                         this._player = new Player(Uuid.v3(packet.name, namespace), packet.name);
+                        //new LoginDisconnectPacket(ChatComponent.buildText('kicked').color(Color.Yellow).underline(true).extra(ChatComponent.buildText(' by ').underline(false).strike(true).color(Color.Hex('ff00ff'))).extra(ChatComponent.buildText('haxe!').color(Gold).italic(true)).extra(ChatComponent.buildText(' wow').obfuscate(true).underline(false).color(Hex('40d0e0')).extra(ChatComponent.buildText('trolled').color(LightGreen).obfuscate(false).font(new Identifier('minecraft', 'alt'))))).send(this);
                         new LoginSuccessPacket().send(this, Uuid.parse(player.uuid), player.name);
                         state = Play;
-                        //new PlayLoginPacket().send(this);
+                        
+                        new PlayLoginPacket().send(this);
+
                         packet;
                     case Play:
                         null;
@@ -129,6 +135,9 @@ class Connection {
                     default:
                         null;
                 }
+            case 0x0C:
+                trace('plugin msg');
+                null;
             default:
                 // unknown packet type. we want to handle it though anyways just in case its useful?
                 ServerboundPacket.readUnknownPacket(input, packetLen, packetId);

@@ -2,6 +2,8 @@ package;
 
 import entity.Entity;
 
+using StringTools;
+
 /*enum abstract LegacyColor(Int) {
     var Black = 0x000000; // &0
     var DarkBlue = 0x0000aa; // &1
@@ -134,8 +136,15 @@ class ChatComponent {
         if (this.isStrikethrough != null) json += '"strikethrough":$isStrikethrough,';
         if (this.isObfuscated != null) json += '"obfuscated":$isObfuscated,';
         if (this.usedColor != null) json += '"color":"${ChatComponent.serializeColor(this.usedColor)}",';
+        if (this.usedFont != null) json += '"font":"${this.usedFont.toString()}",';
+        if (this.extras != null) json += '"extra":[${[for (c in this.extras) c.serialize()].join(',')}],';
+        return json;
+    }
 
-        return json.substr(0, json.length - 2) + '}';
+    inline function comp(str:String):String {
+        if (str.startsWith('{"') && str.endsWith(','))
+            str = str.substr(0, str.length - 1) + '}';
+        return str;
     }
 
     public static function serializeColor(col:Color):String {
@@ -165,6 +174,12 @@ class ChatComponent {
 
 class StringComponent extends ChatComponent {
     public var text:String;
+
+    override public function serialize():String {
+        var s = super.serialize();
+        s += '"text":"$text",';
+        return comp(s);
+    }
 }
 
 class TranslationComponent extends ChatComponent {

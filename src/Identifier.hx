@@ -19,4 +19,8 @@ class Identifier {
             namespace = str.substr(0, colonPos);
         }
     }
+
+    public function toString():String {
+        return '$namespace:$key';
+    }
 }

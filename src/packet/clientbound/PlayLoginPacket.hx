@@ -55,7 +55,7 @@ class PlayLoginPacket extends ClientboundPacket {
          TAG_Byte('has_ceiling', 0x00),
       ])])
    ], 10)]);
-   static var REGISTRY_TAG = TAG_Compound('', [REG_DIMS, REG_BIOMES]);
+   public static var REGISTRY_TAG = TAG_Compound('', [REG_DIMS, REG_BIOMES]);
 
    public function send(client:Connection) {
       var out = this.beginSend(client);

@@ -2,6 +2,8 @@ package packet.clientbound;
 
 import Chat.ChatComponent;
 
+using VarIntLong;
+
 class LoginDisconnectPacket extends ClientboundPacket {
    public var message:ChatComponent;
    
@@ -12,6 +14,7 @@ class LoginDisconnectPacket extends ClientboundPacket {
 
    public function send(to:Connection) {
       var out = beginSend(to);
-      out.writeString(message.serialize());
+      out.writeVarString(message.serialize());
+      finishSend();
    }
 }

@@ -1,5 +1,6 @@
 package packet.clientbound;
 
+import Chat.ChatComponent;
 import haxe.io.BytesOutput;
 import haxe.Json;
 
@@ -25,9 +26,7 @@ class StatusResponsePacket extends ClientboundPacket {
                 }
             ]
         },
-        description: {
-            text: "hello from haxe",
-        },
+        description: Json.parse(ChatComponent.buildText('hello from haxe!').color(Hex('ff00ff')).serialize()),
         previewsChat: false
     }
 

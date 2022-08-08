@@ -27,7 +27,7 @@ enum Tag {
 class NBT {
     public static function writeToStream(out:Output, tag:Tag, inList=false) {
         function writeName() {
-            out.writeInt8(tag.getParameters()[0].length);
+            out.writeInt16(tag.getParameters()[0].length);
             out.writeString(tag.getParameters()[0]);
         }
         switch tag {
@@ -65,7 +65,7 @@ class NBT {
             case TAG_String(_, data):
                 if (!inList) out.writeByte(8);
                 if (!inList) writeName();
-                out.writeInt8(data.length);
+                out.writeInt16(data.length);
                 out.writeString(data);
             case TAG_List(_, data, type):
                 if (!inList) out.writeByte(9);
@@ -95,7 +95,7 @@ class NBT {
         var tagType = input.readByte();
         var tagName = '';
         if (!inList && tagType != 0) {
-            var nameLen = input.readInt8();
+            var nameLen = input.readInt16();
             tagName = input.readString(nameLen);
         }
 
