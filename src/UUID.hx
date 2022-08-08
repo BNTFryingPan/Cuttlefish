@@ -13,6 +13,7 @@ class UUID {
     var upper:Int64;
 
     public function new(upper:Int64, lower:Int64) {
+        trace('new');
         this.upper = upper;
         this.lower = lower;
     }
@@ -42,10 +43,14 @@ class UUID {
     }
 
     public static function fromString(str:String) {
-        var bytes = Uuid.parse(str, '');
-        var upper = bytes.getInt64(0);
+        trace('creating uuid from $str');
+        /*var bytes = Uuid.parse(str, '-');
+        trace(bytes.getData());
+        var upper = bytes.(0);
+        trace('${upper.high.hex()}${upper.low.hex()}');
         var lower = bytes.getInt64(64);
-        trace(upper.high.hex, upper.low.hex);
-        return new UUID(upper, lower);
+        trace(lower);
+        //trace(upper.high.hex, upper.low.hex);
+        return new UUID(upper, lower);*/
     }
 }

@@ -1,5 +1,6 @@
 package;
 
+import packet.clientbound.PlayLoginPacket;
 import haxe.Exception;
 import haxe.io.Bytes;
 import game.BlockLocation;
@@ -44,7 +45,7 @@ class Connection {
     }
 
     public function hasPlayer():Bool {
-        return player != null;
+        return _player != null;
     }
 
     var socketConnected = true;
@@ -77,7 +78,10 @@ class Connection {
                 trace('eof, stopping thread');
                 return;
             } catch (e:Exception) {
-                trace(e.stack.toString());
+                Sys.stderr().writeString(e.details());
+                Sys.stderr().flush();
+                //trace('uncaught exception: ${e.toString()}');
+                //trace(e.details());
             }
         }
     }
@@ -105,9 +109,11 @@ class Connection {
                         packet;
                     case Login:
                         var packet = LoginStartPacket.read(this);
-                        this._player = new Player(Uuid.v3(packet.name, 'OfflinePlayer'), packet.name);
-                        new LoginSuccessPacket().send(this, UUID.fromString(player.uuid), player.name);
+                        var namespace = Bytes.ofString('OfflinePlayer').toHex();
+                        this._player = new Player(Uuid.v3(packet.name, namespace), packet.name);
+                        new LoginSuccessPacket().send(this, Uuid.parse(player.uuid), player.name);
                         state = Play;
+                        //new PlayLoginPacket().send(this);
                         packet;
                     case Play:
                         null;

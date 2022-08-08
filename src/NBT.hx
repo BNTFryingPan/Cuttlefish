@@ -1,5 +1,6 @@
 package;
 
+import haxe.io.Output;
 import haxe.io.Input;
 import haxe.io.Bytes;
 import haxe.Int64;
@@ -24,9 +25,75 @@ enum Tag {
 }
 
 class NBT {
+    public static function writeToStream(out:Output, tag:Tag, inList=false) {
+        function writeName() {
+            out.writeInt8(tag.getParameters()[0].length);
+            out.writeString(tag.getParameters()[0]);
+        }
+        switch tag {
+            case TAG_End:
+                if (!inList) out.writeByte(0);
+            case TAG_Byte(_, data):
+                if (!inList) out.writeByte(1);
+                if (!inList) writeName();
+                out.writeByte(data);
+            case TAG_Short(_, data):
+                if (!inList) out.writeByte(2);
+                if (!inList) writeName();
+                out.writeInt16(data);
+            case TAG_Int(_, data):
+                if (!inList) out.writeByte(3);
+                if (!inList) writeName();
+                out.writeInt32(data);
+            case TAG_Long(_, data):
+                if (!inList) out.writeByte(4);
+                if (!inList) writeName();
+                out.writeInt64(data);
+            case TAG_Float(_, data):
+                if (!inList) out.writeByte(5);
+                if (!inList) writeName();
+                out.writeFloat(data);
+            case TAG_Double(_, data):
+                if (!inList) out.writeByte(6);
+                if (!inList) writeName();
+                out.writeDouble(data);
+            case TAG_Byte_Array(_, data):
+                if (!inList) out.writeByte(7);
+                if (!inList) writeName();
+                out.writeByte(data.length);
+                out.write(data);
+            case TAG_String(_, data):
+                if (!inList) out.writeByte(8);
+                if (!inList) writeName();
+                out.writeInt8(data.length);
+                out.writeString(data);
+            case TAG_List(_, data, type):
+                if (!inList) out.writeByte(9);
+                if (!inList) writeName();
+                out.writeByte(type);
+                out.writeInt32(data.length);
+                for (entry in data) writeToStream(out, entry, true);
+            case TAG_Compound(_, data):
+                if (!inList) out.writeByte(10);
+                if (!inList) writeName();
+                for (entry in data) writeToStream(out, entry, false);
+                writeToStream(out, TAG_End, false);
+            case TAG_Int_Array(_, data):
+                if (!inList) out.writeByte(11);
+                if (!inList) writeName();
+                out.writeInt32(data.length);
+                for (entry in data) out.writeInt32(entry);
+            case TAG_Long_Array(_, data):
+                if (!inList) out.writeByte(12);
+                if (!inList) writeName();
+                out.writeInt32(data.length);
+                for (entry in data) out.writeInt64(entry);
+        }
+    }
+
     public static function readFromStream(input:Input, inList=false, ?type:Int):Tag {
         var tagType = input.readByte();
-        var tagName;
+        var tagName = '';
         if (!inList && tagType != 0) {
             var nameLen = input.readInt8();
             tagName = input.readString(nameLen);

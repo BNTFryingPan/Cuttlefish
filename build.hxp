@@ -1,4 +1,5 @@
 import hxp.*;
+import haxe.Timer;
 
 class Build extends Script {
    public function new() {
@@ -7,14 +8,17 @@ class Build extends Script {
       switch command {
          case 'build':
             command_build();
+            Log.info('Task completed.');
          case 'buildall':
             command_buildAll();
+            Log.info('Task completed.');
          case 'test':
             command_test();
          case 'run':
             command_run();
          default:
             command_build();
+            Log.info('Task completed.');
       }
    }
 
@@ -29,40 +33,55 @@ class Build extends Script {
          return;
       }
 
+      var hasAny = false;
+
       if (flags.get('cpp') || flags.get('c++') || flags.get('cplusplus')) {
          build_cpp();
+         hasAny = true;
       }
 
       if (flags.get('cs') || flags.get('csharp')) {
          build_csharp();
+         hasAny = true;
       }
 
       if (flags.get('hl') || flags.get('hashlink')) {
          build_hashlink();
+         hasAny = true;
       }
 
       if (flags.get('java')) {
          build_java();
+         hasAny = true;
       }
 
       if (flags.get('node') || flags.get('js') || flags.get('nodejs')) {
          build_nodejs();
+         hasAny = true;
       }
 
       if (flags.get('jvm')) {
          build_jvm();
+         hasAny = true;
       }
 
       if (flags.get('neko')) {
          build_neko();
+         hasAny = true;
       }
 
       if (flags.get('py') || flags.get('python')) {
          build_python();
+         hasAny = true;
+      }
+
+      if (!hasAny) {
+         Log.error('No targets specified.');
       }
    }
 
    function command_buildAll() {
+      Log.info('Building all targets');
       build_cpp();
       build_csharp();
       build_hashlink();
@@ -70,7 +89,7 @@ class Build extends Script {
       //build_nodejs(); // hxnodejs doesnt support threads
       build_jvm();
       build_neko();
-      //build_python(); // python compiles... with a syntax error...
+      build_python();
    }
 
    function createBaseHXML():HXML {
@@ -110,9 +129,11 @@ class Build extends Script {
    }
 
    function build_cpp() {
+      Log.info('Building C++');
       var hxml = createBaseHXML();
       hxml.cpp = './build/cpp/';
       hxml.build();
+      
 
       var executablePath = './build/cpp/Main';
       if (flags.get('debug')) executablePath += '-debug';
@@ -126,6 +147,7 @@ class Build extends Script {
    }
 
    function build_csharp() {
+      Log.info('Building C#');
       var hxml = createBaseHXML();
       hxml.cs = './build/csharp/';
       hxml.build();
@@ -143,6 +165,7 @@ class Build extends Script {
    }
 
    function build_hashlink() {
+      Log.info('Building Hashlink');
       var hxml = createBaseHXML();
       hxml.hl = './build/hashlink/Cuttlefish.hl';
       hxml.build();
@@ -153,6 +176,7 @@ class Build extends Script {
    }
 
    function build_jvm() {
+      Log.info('Building JVM Bytecode');
       var hxml = createBaseHXML();
       hxml.java = './build/jvm/';
       hxml.define('jvm', true);
@@ -168,6 +192,7 @@ class Build extends Script {
    }
 
    function build_java() {
+      Log.info('Building Java');
       var hxml = createBaseHXML();
       hxml.java = './build/java/';
       hxml.build();
@@ -178,6 +203,7 @@ class Build extends Script {
    }
 
    function build_neko() {
+      Log.info('Building Neko');
       var hxml = createBaseHXML();
       hxml.neko = './build/neko/Cuttlefish.n';
       hxml.build();
@@ -188,7 +214,7 @@ class Build extends Script {
    }
 
    function build_python() {
-      Log.warn('Python does not currently work, but it does compile!');
+      Log.info('Building Python');
       var hxml = createBaseHXML();
       hxml.python = './build/python/Cuttlefish.py';
       hxml.build();

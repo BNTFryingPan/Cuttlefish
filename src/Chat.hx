@@ -63,16 +63,17 @@ enum HoverEvent {
 
 class ChatComponent {
     public static final LEGACY_COLOR_CHARACTER = '§';
-    public var isBold:Bool = false;
-    public var isItalic:Bool = false;
-    public var isUnderlined:Bool = false;
-    public var isStrikethrough:Bool = false;
-    public var isObfuscated:Bool = false;
-    public var usedFont:Identifier = new Identifier('minecraft', 'default');
-    public var usedColor:Color;
+    public var isBold:Null<Bool> = null;
+    public var isItalic:Null<Bool> = null;
+    public var isUnderlined:Null<Bool> = null;
+    public var isStrikethrough:Null<Bool> = null;
+    public var isObfuscated:Null<Bool> = null;
+    public var usedFont:Null<Identifier> = null;
+    public var usedColor:Null<Color> = null;
     public var onInsertion:Null<String>;
     public var clickEvent:Null<ClickEvent>;
     public var hoverEvent:Null<HoverEvent>;
+    public var extras:Null<Array<ChatComponent>> = null;
 
     public function new() {
 
@@ -117,6 +118,48 @@ class ChatComponent {
     public function color(col:Color):ChatComponent {
         this.usedColor = col;
         return this;
+    }
+
+    public function extra(component:ChatComponent):ChatComponent {
+        if (this.extras == null) this.extras = [];
+        this.extras.push(component);
+        return this;
+    }
+
+    public function serialize():String {
+        var json = '{';
+        if (this.isBold != null) json += '"bold":$isBold,';
+        if (this.isItalic != null) json += '"italic":$isItalic,';
+        if (this.isUnderlined != null) json += '"underlined":$isUnderlined,';
+        if (this.isStrikethrough != null) json += '"strikethrough":$isStrikethrough,';
+        if (this.isObfuscated != null) json += '"obfuscated":$isObfuscated,';
+        if (this.usedColor != null) json += '"color":"${ChatComponent.serializeColor(this.usedColor)}",';
+
+        return json.substr(0, json.length - 2) + '}';
+    }
+
+    public static function serializeColor(col:Color):String {
+        return switch col {
+            case Black: 'black';
+            case DarkBlue: 'dark_blue';
+            case DarkGreen: 'dark_green';
+            case DarkCyan: 'dark_aqua';
+            case DarkRed: 'dark_red';
+            case DarkPurple: 'dark_purple';
+            case Gold: 'gold';
+            case LightGray: 'gray';
+            case DarkGray: 'dark_gray';
+            case LightBlue: 'blue';
+            case LightGreen: 'green';
+            case LightCyan: 'aqua';
+            case LightRed: 'red';
+            case LightPurple: 'light_purple';
+            case Yellow: 'yellow';
+            case White: 'white';
+            case Reset: 'reset';
+            case Legacy(code): code;
+            case Hex(code): '#$code';
+        }
     }
 }
 

@@ -6,12 +6,8 @@ import haxe.Json;
 using VarIntLong;
 
 class StatusResponsePacket extends ClientboundPacket {
-    override function get_id():Int {
-        return 0x00;
-    }
-
     public function new() {
-        super();
+        super(0x00);
     }
     
     public static var response:Dynamic = {
