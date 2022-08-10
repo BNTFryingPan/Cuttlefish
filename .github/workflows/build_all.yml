@@ -27,7 +27,7 @@ jobs:
         haxelib install hxp --always --quiet
         haxelib run hxp --setup-hxp-alias
     - name: build
-      run: hxp build ${{ input.flags }}
+      run: hxp build ${{ inputs.flags }}
     - name: archive
       uses: thedoctor0/zip-release@master
       with:
