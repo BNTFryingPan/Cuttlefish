@@ -1,0 +1,47 @@
+name: Build Linux
+
+on:
+  workflow_dispatch:
+    inputs:
+      flags:
+        type: string
+        required: true
+        default: '-all'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: setup haxe
+      uses: krdlab/setup-haxe@v1
+      with:
+        haxe-version: 4.2.4
+    
+    - name: setup libs
+      run: |
+        haxelib install uuid --always --quiet
+        haxelib install hxjava --always --quiet
+        haxelib install hxcpp --always --quiet
+        haxelib install hxcs --always --quiet
+        haxelib install hxp --always --quiet
+        haxelib run hxp --setup-hxp-alias
+    - name: build
+      run: hxp build ${{ input.flags }}
+    - name: archive
+      uses: thedoctor0/zip-release@master
+      with:
+        type: 'tar'
+        filename: '../linux.tar.gz'
+        directory: './out/'
+        path: '.'
+    - name: release on github
+      uses: "marvinpinto/action-automatic-releases@latest"
+      with:
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        #allowUpdates: true
+        automatic_release_tag: "linux"
+        prerelease: true
+        title: "Linux Build"
+        files: |
+          ./linux.tar.gz

@@ -1,0 +1,24 @@
+name: Setup
+
+on:
+  workflow_call:
+    inputs:
+      host:
+        required: true
+        type: string
+
+jobs:
+  setup:
+    runs-on: ${{inputs.host}}-latest
+    
+    steps:
+    - uses: actions/checkout@v1
+    - name: setup haxe
+      uses: krdlab/setup-haxe@v1
+      with:
+        haxe-version: 4.2.4
+    
+    - name: setup libs
+      run: |
+        haxelib install hxp --always --quiet
+        haxelib run hxp --setup-hxp-alias
