@@ -150,7 +150,14 @@ class Build extends Script {
       Log.info('Building C#');
       var hxml = createBaseHXML();
       hxml.cs = './build/csharp/';
-      hxml.build();
+      try {
+         hxml.build();
+      } catch (e:haxe.Exception) {
+         trace(e.stack);
+         Log.error('Failed to build C#');
+         return;
+      }
+      
 
       var executablePath = './build/csharp/bin/Main';
       if (flags.get('debug')) executablePath += '-Debug';

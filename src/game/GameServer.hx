@@ -1,13 +1,17 @@
 package game;
 
+import game.DataParser;
 import sys.net.Host;
 import sys.net.Socket;
 import entity.Player;
 
 class GameServer {
-    public var players:Array<Player>;
-    public var connections:Array<Connection>;
+    public var players:Array<Player> = [];
+    public var connections:Array<Connection> = [];
     var listeningSocket:Socket;
+
+    public var blockRegistry:SubRegistry;
+    public var entityRegistry:SubRegistry;
 
     public static final VERSION:VersionInfo = AllVersions.VERSION_1_19;
 
@@ -19,8 +23,10 @@ class GameServer {
             throw 'invalid port';
         }
 
-        this.players = [];
-        this.connections = [];
+        this.blockRegistry = DataParser.getRegistry(new Identifier('minecraft', 'block'));
+        this.entityRegistry = DataParser.getRegistry(new Identifier('minecraft', 'entity_type'));
+
+        // trace(blockRegistry.entries);
 
         this.listeningSocket = new Socket();
         this.listeningSocket.bind(new Host('0.0.0.0'), port);

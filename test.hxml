@@ -1,5 +1,5 @@
 -p src
 -m UnitTest
 -L uuid
---cpp ./build/
---cmd ./build/UnitTest
+--neko ./build/neko/test.n
+--cmd neko ./build/neko/test.n

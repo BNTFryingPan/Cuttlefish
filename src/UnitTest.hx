@@ -1,5 +1,7 @@
 package;
 
+import haxe.Exception;
+import game.DataParser;
 import sys.io.File;
 import packet.clientbound.PlayLoginPacket;
 import haxe.io.BytesOutput;
@@ -16,7 +18,7 @@ using VarIntLong;
 **/
 class UnitTest {
     public static function main() {
-        testVarInt(0);
+        /*testVarInt(0);
         testVarInt(1);
         testVarInt(2);
         testVarInt(127);
@@ -28,7 +30,13 @@ class UnitTest {
         testVarInt(-1);
         testVarInt(-2147483648);
 
-        testNBT();
+        testNBT();*/
+
+        try {
+            DataParser.getEntityRegistry();
+        } catch (e:Exception) {
+            trace(e.stack);
+        }
     }
 
     static function testVarInt(number:Int) {

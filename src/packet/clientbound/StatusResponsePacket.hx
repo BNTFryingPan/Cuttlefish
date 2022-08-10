@@ -26,7 +26,7 @@ class StatusResponsePacket extends ClientboundPacket {
                 }
             ]
         },
-        description: Json.parse(ChatComponent.buildText('hello from haxe!').color(Hex('ff00ff')).serialize()),
+        description: Json.parse(ChatComponent.buildText('hey bud!').color(Hex('ff00ff')).extra(ChatComponent.buildText(' how are you today').italic(true).color(Hex('40d0e0'))).serialize()),
         previewsChat: false
     }
 
