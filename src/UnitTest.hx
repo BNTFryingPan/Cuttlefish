@@ -33,7 +33,7 @@ class UnitTest {
         testNBT();*/
 
         try {
-            DataParser.getEntityRegistry();
+            //DataParser.getEntityRegistry();
         } catch (e:Exception) {
             trace(e.stack);
         }
