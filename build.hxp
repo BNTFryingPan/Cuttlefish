@@ -17,8 +17,12 @@ class Build extends Script {
          case 'run':
             command_run();
          default:
-            command_build();
-            Log.info('Task completed.');
+            Log.info('Cuttlefish Build Tool - Help
+Commands:
+   build [list of target flags] - Builds Cuttlefish for all targets listed
+   buildall - Builds Cuttlefish for all targets. Shortcut for `build` followed by all target flags
+   run <target> - Runs the most recent build available of Cuttlefish for the provided target
+   test <target> - Builds and then runs Cuttlefish for the provided target. Shortcut for `build -<target>` then `run <target>`');
       }
    }
 

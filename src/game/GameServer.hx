@@ -1,5 +1,6 @@
 package game;
 
+import Chat;
 import game.DataParser;
 import sys.net.Host;
 import sys.net.Socket;
@@ -26,6 +27,13 @@ class GameServer {
         this.blockRegistry = DataParser.getRegistry(new Identifier('minecraft', 'block'));
         this.entityRegistry = DataParser.getRegistry(new Identifier('minecraft', 'entity_type'));
 
+        DataParser.loadBlockStateData();
+
+        var out = Sys.stdout();
+
+        trace(Logger.colorToAnsi(Color.Gold));
+        out.writeString(ChatComponent.buildText('hello').color(Color.Gold).terminalize() + '\n');
+        out.writeString(ChatComponent.buildText('kicked').color(Color.Yellow).underline(true).extra(ChatComponent.buildText(' by ').underline(false).strike(true).color(Color.Hex('ff00ff'))).extra(ChatComponent.buildText('haxe!').color(Gold).italic(true)).extra(ChatComponent.buildText(' wow').obfuscate(true).underline(false).color(Hex('40d0e0')).extra(ChatComponent.buildText('trolled').color(LightGreen).obfuscate(false).font(new Identifier('minecraft', 'alt')))).terminalize() + '\n');
         // trace(blockRegistry.entries);
 
         this.listeningSocket = new Socket();

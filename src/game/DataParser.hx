@@ -27,6 +27,7 @@ typedef BlockState = Map<String, String>;
 class DataParser {
     public static var dataLocation:String = '~/Desktop/dev/Calamari/data';
     public static var blockStateData:Null<Map<String, BlockStateList>> = null;
+    public static var blockStateCount:Null<Int> = null;
 
     public static function getRegistry(name:Identifier):SubRegistry {
         var content = File.getContent('/home/frying-pan/Desktop/dev/Calamari/data/generated/reports/registries.json');
@@ -44,14 +45,18 @@ class DataParser {
         return ret;
     }
 
-    static function loadBlockStateData() {
+    public static function loadBlockStateData() {
         if (blockStateData != null) return;
-        var content = File.getContent('$dataLocation/generated/reports/blocks.json');
+        var content = File.getContent('/home/frying-pan/Desktop/dev/Calamari/data/generated/reports/blocks.json');
         var parsed:DynamicAccess<BlockStateList> = Json.parse(content);
 
         trace(parsed.get('minecraft:acacia_button').states[0].id);
-
-        
+        var sanitized:Map<String, BlockStateList> = [];
+        for (name => data in parsed) {
+            sanitized.set(name, {properties: data.properties, states: data.states});
+            DataParser.blockStateCount += data.states.length;
+        }
+        DataParser.blockStateData = sanitized;
     }
 
     public static function getBlockStateFromId(id:Int):BlockState {

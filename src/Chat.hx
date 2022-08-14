@@ -141,6 +141,19 @@ class ChatComponent {
         return json;
     }
 
+    public function terminalize(?before:String):String {
+        var out = '';
+        if (before != null) out += before;
+        if (this.isBold != null) out += this.isBold ? Logger.ansi_bold : Logger.ansi_bold_end;
+        if (this.isItalic != null) out += this.isItalic ? Logger.ansi_italic : Logger.ansi_italic_end;
+        if (this.isUnderlined != null) out += this.isUnderlined ? Logger.ansi_underline : Logger.ansi_underline_end;
+        if (this.isStrikethrough != null) out += this.isStrikethrough ? Logger.ansi_strike : Logger.ansi_strike_end;
+        if (this.isObfuscated != null) out += this.isObfuscated ? Logger.ansi_obsfucated : Logger.ansi_obsfucated_end;
+        if (this.usedColor != null) out += ChatComponent.terminalizeColor(this.usedColor);
+        if (this.extras != null) for (extra in extras) out += extra.terminalize();
+        return out;
+    }
+
     inline function comp(str:String):String {
         if (str.startsWith('{"') && str.endsWith(','))
             str = str.substr(0, str.length - 1) + '}';
@@ -170,6 +183,10 @@ class ChatComponent {
             case Hex(code): '#$code';
         }
     }
+
+    public static function terminalizeColor(col:Color):String {
+        return Logger.colorToAnsi(col);
+    }
 }
 
 class StringComponent extends ChatComponent {
@@ -179,6 +196,11 @@ class StringComponent extends ChatComponent {
         var s = super.serialize();
         s += '"text":"$text",';
         return comp(s);
+    }
+
+    override public function terminalize(?before:String):String {
+        var s = super.terminalize(text);
+        return s;
     }
 }
 
