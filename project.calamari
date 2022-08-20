@@ -1,0 +1,18 @@
+{
+    "projectName": "Cuttlefish",
+    "versionFile": "${root}/version.txt",
+    "mainClass": "Main",
+    "classPath": "src",
+    "libraries": ["uuid"],
+    "supportedTargets": [
+        "cpp",
+        "csharp",
+        "hashlink",
+        "neko",
+        "java",
+        "jvm",
+        "python"
+    ],
+    "buildFolder": "${root}/build/",
+    "exportFolder": "${root}/out/"
+}
